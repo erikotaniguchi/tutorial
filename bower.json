@@ -1,0 +1,17 @@
+{
+  "name": "tutorial",
+  "homepage": "https://github.com/erikotaniguchi/tutorial",
+  "authors": [
+    "Eriko Taniguchi <eriko.taniguchi@ntt.eu>"
+  ],
+  "description": "js tutorial",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
