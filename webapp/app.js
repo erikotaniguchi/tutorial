@@ -16,3 +16,11 @@ accountsCollection.fetch({
         console.log('error loading accounts ', arguments);
     }
 })
+
+var AccountsView = Backbone.View.extend({
+    template: _.template($('#accounts-tmpl').html()),
+    render: function() {
+        this.$el.html(this.template());
+        return this;
+    }
+});
