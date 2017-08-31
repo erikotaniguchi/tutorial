@@ -8,12 +8,13 @@ var AccountCollection = Backbone.Collection.extend({
     }
 });
 var accountsCollection = new AccountCollection();
+
 accountsCollection.fetch({
-    reset: true,
-    success: function(collection) {
-        console.log('loaded accounts ', collection);
-    },
-    error: function() {
+     reset: true,
+     success: function(collection) {
+        Backbone.history.start();
+     },
+     error: function() {
         console.log('error loading accounts ', arguments);
     }
 });
@@ -50,8 +51,46 @@ var AccountsView = Backbone.View.extend({
     }
 });
 
+
+var AccountView = Backbone.View.extend({
+    template: _.template($('#account-tmpl').html()),
+    credentialTemplate: _.template($('#account-param-tmpl').html()),
+    renderParam: function(key, value) {
+        var $el = $('.js-account-param-list', this.$el);
+        $el.append(this.credentialTemplate({key:key, value:value}));
+    },
+    render: function(options) {
+        var self = this,
+            model = this.model.toJSON();
+        $(this.el).html(this.template(model));
+        _.each(model.parameterized_credentials, function(value, key) {
+            self.renderParam(key, value);
+        });
+        return this;
+    }
+});
 var accountsView = new AccountsView({
     collection: accountsCollection
 });
-console.log('rendering accounts');
-$('#js-app').html(accountsView.render().el)
+
+
+var accountView;
+var Router = Backbone.Router.extend({
+    routes: {
+        "accounts/:uuid": "viewAccount",
+        "*other": "viewAccounts"
+    },
+    viewAccount: function(accountId) {
+        this.viewAccounts();
+        var model = accountsCollection.findWhere({ uuid: accountId });
+        accountView = new AccountView({ model: model });
+        $('#js-account').html(accountView.render().el);
+    },
+    viewAccounts: function() {
+        $('#js-accounts').html(accountsView.render().el);
+        if(accountView) {
+            accountView.remove();
+        }
+    }
+});
+new Router();
