@@ -9,20 +9,22 @@ var AccountCollection = Backbone.Collection.extend({
 });
 var accountsCollection = new AccountCollection();
 accountsCollection.fetch({
+    reset: true,
     success: function(collection) {
         console.log('loaded accounts ', collection);
-        var accountsView = new AccountsView({
-            collection: accountsCollection
-        });
-        $('#js-app').html(accountsView.render().el)
     },
     error: function() {
         console.log('error loading accounts ', arguments);
     }
 });
 
+
+
 var AccountItemView = Backbone.View.extend({
     template: _.template($('#account-item-tmpl').html()),
+    initialize: function() {
+    this.listenTo(this.collection, 'reset', this.render)
+    },
     tagName: 'li',
     className: 'list-group-item',
     render: function() {
@@ -47,3 +49,9 @@ var AccountsView = Backbone.View.extend({
         return this;
     }
 });
+
+var accountsView = new AccountsView({
+    collection: accountsCollection
+});
+console.log('rendering accounts');
+$('#js-app').html(accountsView.render().el)
