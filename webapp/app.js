@@ -94,3 +94,38 @@ var Router = Backbone.Router.extend({
     }
 });
 new Router();
+
+
+
+
+
+var VmModel = Backbone.Model.extend({});
+var VmCollection = Backbone.Collection.extend({
+    url: 'data/vms.json',
+    model: VmModel,
+    parse : function(resp) {
+        //Because the server won't return a top-level JSON Array!
+        return resp.vms;
+    }
+});
+var vmsCollection = new VmCollection();
+vmsCollection.fetch({
+    success: function(collection) {
+        console.log('loaded vms ', collection);
+    },
+    error: function() {
+        console.log('error loading vms ', arguments);
+    }
+})
+
+
+
+var VmsView = Backbone.View.extend({
+    template: _.template($('#accounts-tmpl').html()),
+    render: function() {
+        this.$el.html(this.template());
+        return this;
+    }
+});
+var vmsView = new VmsView();
+$('#js-app2').html(vmsView.render().el)
