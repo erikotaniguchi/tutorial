@@ -260,6 +260,10 @@ th {
     border: 1px solid #ddd !important;
   }
 }
+
+.row{
+  margin-top: 50px;
+}
 @font-face {
   font-family: 'Glyphicons Halflings';
 
