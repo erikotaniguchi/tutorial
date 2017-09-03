@@ -121,11 +121,13 @@ vmsCollection.fetch({
 
 
 var VmsView = Backbone.View.extend({
-    template: _.template($('#accounts-tmpl').html()),
+    template: _.template($('#vms-tmpl').html()),
     render: function() {
         this.$el.html(this.template());
         return this;
     }
 });
+
+
 var vmsView = new VmsView();
 $('#js-app2').html(vmsView.render().el)
