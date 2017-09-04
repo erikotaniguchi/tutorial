@@ -239,6 +239,7 @@ var Router = Backbone.Router.extend({
 });
 new Router();
 
+<<<<<<< HEAD
 // var Router = Backbone.Router.extend({
 //     routes: {
 //         "vms/:uuid/vm/:uuid": "viewAccount",
@@ -270,3 +271,66 @@ new Router();
 //             vmView.remove();
 // };
 // new Router();
+=======
+
+
+
+
+var VmModel = Backbone.Model.extend({});
+var VmCollection = Backbone.Collection.extend({
+    url: 'data/vms.json',
+    model: VmModel,
+    parse : function(resp) {
+        //Because the server won't return a top-level JSON Array!
+        return resp.vms;
+    }
+});
+var vmsCollection = new VmCollection();
+vmsCollection.fetch({
+    reset: true,
+    success: function(collection) {
+        console.log('loaded vms ', collection);
+    },
+    error: function() {
+        console.log('error loading vms ', arguments);
+    }
+})
+
+
+var VmItemView = Backbone.View.extend({
+    template: _.template($('#vm-item-tmpl').html()),
+    tagName: 'li',
+    className: 'list-group-item',
+    render: function() {
+      var $el = $(this.el);
+      $el.html(this.template(this.model.toJSON()));
+      return this;
+    }
+})
+
+var VmsView = Backbone.View.extend({
+    template: _.template($('#vms-tmpl').html()),
+    initialize: function() {
+    this.listenTo(this.collection, 'reset', this.render)
+    },
+    renderListItem: function(model) {
+        var item = new VmItemView({model: model});
+        $('.js-vms-list', this.$el).append(item.render().el);
+    },
+    render: function() {
+        var self = this;
+        this.$el.html(this.template());
+        this.collection.each(function(vm) {
+                self.renderListItem(vm);
+        });
+        return this;
+    }
+});
+
+var vmsView = new VmsView({
+    collection: vmsCollection
+});
+console.log('rendering vms');
+$('#js-app2').html(vmsView.render().el)
+
+>>>>>>> origin
