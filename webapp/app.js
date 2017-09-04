@@ -110,12 +110,9 @@ var VmCollection = Backbone.Collection.extend({
 });
 var vmsCollection = new VmCollection();
 vmsCollection.fetch({
+    reset: true,
     success: function(collection) {
         console.log('loaded vms ', collection);
-        var vmsView = new VmsView({
-            collection: vmsCollection
-        });
-        $('#js-app2').html(vmsView.render().el)
     },
     error: function() {
         console.log('error loading vms ', arguments);
@@ -136,6 +133,9 @@ var VmItemView = Backbone.View.extend({
 
 var VmsView = Backbone.View.extend({
     template: _.template($('#vms-tmpl').html()),
+    initialize: function() {
+    this.listenTo(this.collection, 'reset', this.render)
+    },
     renderListItem: function(model) {
         var item = new VmItemView({model: model});
         $('.js-vms-list', this.$el).append(item.render().el);
@@ -150,7 +150,9 @@ var VmsView = Backbone.View.extend({
     }
 });
 
-
-
-var vmsView = new VmsView();
+var vmsView = new VmsView({
+    collection: vmsCollection
+});
+console.log('rendering vms');
 $('#js-app2').html(vmsView.render().el)
+
