@@ -136,10 +136,13 @@ var VmItemView = Backbone.View.extend({
 
 var VmsView = Backbone.View.extend({
     template: _.template($('#vms-tmpl').html()),
+<<<<<<< HEAD
     renderListItem: function(model) {
         var item = new VmItemView({model: model});
         $('.js-vms-list', this.$el).append(item.render().el);
     },
+=======
+>>>>>>> 71c041e38a258c7423535af93c3da017ffac4999
     render: function() {
         var self = this;
         this.$el.html(this.template());
@@ -151,6 +154,9 @@ var VmsView = Backbone.View.extend({
 });
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 71c041e38a258c7423535af93c3da017ffac4999
 var vmsView = new VmsView();
 $('#js-app2').html(vmsView.render().el)
