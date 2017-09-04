@@ -112,6 +112,10 @@ var vmsCollection = new VmCollection();
 vmsCollection.fetch({
     success: function(collection) {
         console.log('loaded vms ', collection);
+        var vmsView = new VmsView({
+            collection: vmsCollection
+        });
+        $('#js-app2').html(vmsView.render().el)
     },
     error: function() {
         console.log('error loading vms ', arguments);
@@ -119,13 +123,34 @@ vmsCollection.fetch({
 })
 
 
+var VmItemView = Backbone.View.extend({
+    template: _.template($('#vm-item-tmpl').html()),
+    tagName: 'li',
+    className: 'list-group-item',
+    render: function() {
+      var $el = $(this.el);
+      $el.html(this.template(this.model.toJSON()));
+      return this;
+    }
+})
 
 var VmsView = Backbone.View.extend({
-    template: _.template($('#accounts-tmpl').html()),
+    template: _.template($('#vms-tmpl').html()),
+    renderListItem: function(model) {
+        var item = new VmItemView({model: model});
+        $('.js-vms-list', this.$el).append(item.render().el);
+    },
     render: function() {
+        var self = this;
         this.$el.html(this.template());
+        this.collection.each(function(vm) {
+                self.renderListItem(vm);
+        });
         return this;
     }
 });
+
+
+
 var vmsView = new VmsView();
 $('#js-app2').html(vmsView.render().el)
