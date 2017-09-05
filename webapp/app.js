@@ -21,34 +21,19 @@ accountsCollection.fetch({
 
 
 //  Accounts List column
-var AccountItemView = Backbone.View.extend({
+var AccountItemView = Backbone.Marionette.ItemView.extend({
     template: _.template($('#account-item-tmpl').html()),
     initialize: function() {
     this.listenTo(this.collection, 'reset', this.render)
     },
     tagName: 'li',
     className: 'list-group-item',
-    render: function() {
-      var $el = $(this.el);
-      $el.html(this.template(this.model.toJSON()));
-      return this;
-    }
 })
 
-var AccountsView = Backbone.View.extend({
+var AccountsView = Backbone.Marionette.CompositeView.extend({
     template: _.template($('#accounts-tmpl').html()),
-    renderListItem: function(model) {
-        var item = new AccountItemView({model: model});
-        $('.js-accounts-list', this.$el).append(item.render().el);
-    },
-    render: function() {
-        var self = this;
-        this.$el.html(this.template());
-        this.collection.each(function(account) {
-                self.renderListItem(account);
-        });
-        return this;
-    }
+    childView: AccountItemView,
+    childViewContainer: '.js-accounts-list'
 });
 
 // Account details colum
