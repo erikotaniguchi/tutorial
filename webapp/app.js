@@ -20,7 +20,7 @@ accountsCollection.fetch({
 });
 
 
-
+//  Accounts List column
 var AccountItemView = Backbone.View.extend({
     template: _.template($('#account-item-tmpl').html()),
     initialize: function() {
@@ -51,7 +51,7 @@ var AccountsView = Backbone.View.extend({
     }
 });
 
-
+// Account details colum
 var AccountView = Backbone.View.extend({
     template: _.template($('#account-tmpl').html()),
     credentialTemplate: _.template($('#account-param-tmpl').html()),
@@ -96,9 +96,6 @@ var accountView;
 // new Router();
 
 
-
-
-
 var VmModel = Backbone.Model.extend({});
 var VmCollection = Backbone.Collection.extend({
     url: 'data/vms.json',
@@ -119,7 +116,7 @@ vmsCollection.fetch({
     }
 })
 
-
+// VM List colum
 var VmItemView = Backbone.View.extend({
     template: _.template($('#vm-item-tmpl').html()),
     tagName: 'li',
@@ -150,6 +147,7 @@ var VmsView = Backbone.View.extend({
     }
 });
 
+// VM details colum
 
 var VmView = Backbone.View.extend({
     template: _.template($('#vm-tmpl').html()),
@@ -169,14 +167,62 @@ var VmView = Backbone.View.extend({
     }
 });
 
-
-
 var vmsView = new VmsView({
     collection: vmsCollection
 });
 
 
 var vmView;
+
+// Routing
+var Router = Backbone.Router.extend({
+    routes: {
+        "accounts/:uuid/vms/:vmuuid": "viewVm",
+        "accounts/:uuid": "viewAccount",
+        "*other": "viewAccounts"
+    },
+
+    viewVm: function(accountId, vmId) {
+        // console.log('viewVm');
+
+        this.viewAccount(accountId);
+
+        var model = vmsCollection.findWhere({ uuid: vmId });
+        vmView = new VmView({ model: model });
+        $('#js-vm').html(vmView.render().el);
+
+    },
+
+
+    viewAccount: function(accountId) {
+
+        this.viewAccounts();
+
+        var model = accountsCollection.findWhere({ uuid: accountId });
+        accountView = new AccountView({ model: model });
+        $('#js-account').html(accountView.render().el);
+
+
+// Show third column here
+        var model = vmsCollection.findWhere({ account_uuid: accountId });
+        vmView = new VmsView({ model: model });
+         $('#js-vms').html(vmsView.render().el);
+         if(vmView) {
+            vmView.remove();
+        }
+    },
+
+
+
+    viewAccounts: function() {
+        $('#js-accounts').html(accountsView.render().el);
+        if(accountView) {
+            accountView.remove();
+        }
+    }
+});
+new Router();
+
 // var Router = Backbone.Router.extend({
 //     routes: {
 //         "vms/:uuid": "viewVm",
@@ -197,49 +243,7 @@ var vmView;
 // });
 // new Router();
 
-var Router = Backbone.Router.extend({
-    routes: {
-        "accounts/:uuid/vms/:vmuuid": "viewVms",
-        "accounts/:uuid": "viewAccount",
-        "*other": "viewAccounts"
-    },
-    viewVm: function(vmId) {
-        console.log('viewVm');
-        // this.viewVms();
-        // var model = vmsCollection.findWhere({ uuid: vmId });
-        // vmView = new VmView({ model: model });
-        // $('#js-vm').html(vmView.render().el);
-        this.viewVms();
 
-        var model = vmsCollection.findWhere({ uuid: vmId });
-        vmView = new VmView({ model: model });
-        $('#js-vm').html(vmView.render().el);
-    },
-    viewAccount: function(accountId) {
-
-        this.viewAccounts();
-
-        var model = accountsCollection.findWhere({ uuid: accountId });
-        accountView = new AccountView({ model: model });
-        $('#js-account').html(accountView.render().el);
-
-    var filteredCollection = this.vmsCollection.where({ account_uuid: accountId });
-        this.vmListView = new VirtualMachineListView({ collection: filteredCollection });
-        this.mainLayout.vms.show(this.vmListView);
-    },
-
-        // Show third column here
-    },
-    viewAccounts: function() {
-        $('#js-accounts').html(accountsView.render().el);
-        if(accountView) {
-            accountView.remove();
-        }
-    }
-});
-new Router();
-
-<<<<<<< HEAD
 // var Router = Backbone.Router.extend({
 //     routes: {
 //         "vms/:uuid/vm/:uuid": "viewAccount",
@@ -271,66 +275,3 @@ new Router();
 //             vmView.remove();
 // };
 // new Router();
-=======
-
-
-
-
-var VmModel = Backbone.Model.extend({});
-var VmCollection = Backbone.Collection.extend({
-    url: 'data/vms.json',
-    model: VmModel,
-    parse : function(resp) {
-        //Because the server won't return a top-level JSON Array!
-        return resp.vms;
-    }
-});
-var vmsCollection = new VmCollection();
-vmsCollection.fetch({
-    reset: true,
-    success: function(collection) {
-        console.log('loaded vms ', collection);
-    },
-    error: function() {
-        console.log('error loading vms ', arguments);
-    }
-})
-
-
-var VmItemView = Backbone.View.extend({
-    template: _.template($('#vm-item-tmpl').html()),
-    tagName: 'li',
-    className: 'list-group-item',
-    render: function() {
-      var $el = $(this.el);
-      $el.html(this.template(this.model.toJSON()));
-      return this;
-    }
-})
-
-var VmsView = Backbone.View.extend({
-    template: _.template($('#vms-tmpl').html()),
-    initialize: function() {
-    this.listenTo(this.collection, 'reset', this.render)
-    },
-    renderListItem: function(model) {
-        var item = new VmItemView({model: model});
-        $('.js-vms-list', this.$el).append(item.render().el);
-    },
-    render: function() {
-        var self = this;
-        this.$el.html(this.template());
-        this.collection.each(function(vm) {
-                self.renderListItem(vm);
-        });
-        return this;
-    }
-});
-
-var vmsView = new VmsView({
-    collection: vmsCollection
-});
-console.log('rendering vms');
-$('#js-app2').html(vmsView.render().el)
-
->>>>>>> origin
