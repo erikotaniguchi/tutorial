@@ -7,29 +7,26 @@
   </head>
   <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <a class="navbar-brand logo">Bespin Tutorial</a>
-        </div>
-        <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li>
-              <a href="#">Home</a>
-            </li>
-          </ul>
-        </div>
-      </div>
+    <div class="container">
+    <div class="navbar-header">
+    <a class="navbar-brand logo">Bespin Tutorial</a>
     </div>
-
-
+    <div class="navbar-collapse collapse">
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="#">Home</a>
+      </li>
+    </ul>
+    </div>
+    </div>
+    </div>
+    <div class="row">
     <div id="js-app" class="app container-fluid">
-        <div class="row">
-            <div id="js-accounts" class="col-md-6"></div>
-            <div id="js-account" class="col-md-6"></div>
-        </div>
+    <div id="js-accounts" class="col-md-3">
     </div>
-
-      <script type="text/template" id="accounts-tmpl">
+    <div id="js-account" class="col-md-3">
+    </div>
+    <script type="text/template" id="accounts-tmpl">
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Accounts</h3>
@@ -39,7 +36,6 @@
         </div>
     </div>
 </script>
-
     <script type="text/template" id="account-item-tmpl">
         <a href="#accounts/<%= uuid %>">
             <span class="name"><%= name %></span>
@@ -62,14 +58,13 @@
              <span class="value"><%= value %></span>
         </li>
     </script>
-   <div id="js-app2" class="app container-fluid">
-        <div class="row">
-            <div id="js-vms" class="col-md-6"></div>
-            <div id="js-vm" class="col-md-6"></div>
-        </div>
+    <div id="js-vms" class="col-md-3">
     </div>
-
-<script type="text/template" id="vms-tmpl">
+    <div id="js-vm" class="col-md-3">
+    </div>
+    </div>
+    </div>
+    <script type="text/template" id="vms-tmpl">
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Virtual Machines</h3>
@@ -79,7 +74,6 @@
         </div>
     </div>
 </script>
-
     <script type="text/template" id="vm-item-tmpl">
         <a href="#accounts/<%= account_uuid %>/vms/<%= uuid %>">
             <span class="name"><%= account_name %></span>
@@ -103,7 +97,7 @@
         </li>
 
     </script>
-
+    </div>
     <script src="vendor/jquery/dist/jquery.js"></script>
     <script src="vendor/underscore/underscore.js"></script>
     <script src="vendor/backbone/backbone.js"></script>
