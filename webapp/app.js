@@ -134,62 +134,67 @@ vmsCollection.fetch({
 })
 
 // VM List colum
-var VmItemView = Backbone.View.extend({
+var ParamView = Backbone.Marionette.ItemView.extend({
+    template: _.template($('#vm-param-tmpl').html()),
+    tagName: 'li',
+    className: 'list-group-item',
+})
+var ParamsView = Backbone.Marionette.CollectionView.extend({
+    template: _.template($('#vms-tmpl').html()),
+    tagName: 'ul',
+    className: 'list-group',
+    childView: ParamView
+});
+var VmItemView = Backbone.Marionette.ItemView.extend({
     template: _.template($('#vm-item-tmpl').html()),
     tagName: 'li',
     className: 'list-group-item',
-    render: function() {
-      var $el = $(this.el);
-      $el.html(this.template(this.model.toJSON()));
-      return this;
+    initialize: function(){
+        console.log(this.model);
     }
 })
 
-var VmsView = Backbone.View.extend({
+var VmsView = Backbone.Marionette.CompositeView.extend({
     template: _.template($('#vms-tmpl').html()),
-    initialize: function() {
-    this.listenTo(this.collection, 'reset', this.render)
-    },
-    renderListItem: function(model) {
-        var item = new VmItemView({model: model});
-        $('.js-vms-list', this.$el).append(item.render().el);
-    },
-    render: function() {
-        var self = this;
-        this.$el.html(this.template());
-        this.collection.each(function(vm) {
-                self.renderListItem(vm);
-        });
-        return this;
-    }
+    childView: VmItemView,
+    childViewContainer: '.js-vms-list'
 });
 
 // VM details colum
-
-var VmView = Backbone.View.extend({
+var VmView = Backbone.Marionette.LayoutView.extend({
     template: _.template($('#vm-tmpl').html()),
-    credentialTemplate: _.template($('#vm-param-tmpl').html()),
-    renderParam: function(key, value) {
-        var $el = $('.js-vm-param-list', this.$el);
-        $el.append(this.credentialTemplate({key:key, value:value}));
+    credentials: null,
+    regions: {
+        paramList: '.js-vm-param-list'
     },
-    render: function(options) {
-        var self = this,
-            model = this.model.toJSON();
-        $(this.el).html(this.template(model));
-        _.each(model.extra, function(value, key) {
-            self.renderParam(key, value);
-        });
-        return this;
+    modelEvents: {
+        'change': 'updateCredentials'
+    },
+    initialize: function() {
+        this.credentials = new Backbone.Collection();
+        this.updateCredentials();
+    },
+    onShow: function() {
+        this.paramList.show(new ParamsView( {
+            collection: this.credentials
+        }))
+    },
+    updateCredentials: function() {
+        var data = [];
+        _.each(this.model.get('extra'), function(value, key) {
+            data.push({'name': key, 'value': value});
+        })
+        this.credentials.reset(data);
     }
 });
 
-var vmsView = new VmsView({
-    collection: vmsCollection
-});
+
+// var vmsView = new VmsView({
+//     collection: vmsCollection
+// });
 
 
-var vmView;
+// var vmView;
 
 
 var App = new Backbone.Marionette.Application({
@@ -202,7 +207,7 @@ var App = new Backbone.Marionette.Application({
     onBeforeStart: function() {
         this.router = new Marionette.AppRouter({
             appRoutes: {
-                //"accounts/:uuid/vms/:vmuuid": "viewAccountVM",
+                "accounts/:uuid/vms/:vmuuid": "viewAccountVM",
                 "accounts/:uuid": "viewAccount",
                 "*other": "viewAccounts"
             },
@@ -245,9 +250,14 @@ var App = new Backbone.Marionette.Application({
     },
     viewAccountVM: function(accountId, vmId) {
         this.viewAccount(accountId);
+
+        console.log('viewVm');
+
         var model = vmsCollection.findWhere({ uuid: vmId });
-        vmView = new VMView({ model: model });
-        $('#js-vm').html(vmView.render().el);
+        this.vmView = new VmView({ model: model });
+        this.mainLayout.vm.show(this.vmView);
+        // vmView = new VmView({ model: model });
+        // $('#js-vm').html(vmView.render().el);
     },
     viewAccount: function(accountId) {
         this.viewAccounts();
@@ -255,8 +265,8 @@ var App = new Backbone.Marionette.Application({
             collection = new VmCollection(this.vmsCollection.where({ account_uuid: accountId }));
         this.accountView = new AccountView({ model: model });
         this.mainLayout.account.show(this.accountView);
-        //vmsView = new VMsView({ collection: collection });
-        //$('#js-vms').html(vmsView.render().el);
+        vmsView = new VmsView({ collection: collection });
+        $('#js-vms').html(vmsView.render().el);
     },
     viewAccounts: function() {
         this.mainLayout.accounts.show(this.accountsView);
@@ -274,52 +284,3 @@ var App = new Backbone.Marionette.Application({
 App.start();
 
 
-// Routing
-/*var Router = Backbone.Router.extend({
-    routes: {
-        //"accounts/:uuid/vms/:vmuuid": "viewVM",
-        "accounts/:uuid": "viewAccount",
-        "*other": "viewAccounts"
-    },
-
-    viewVm: function(accountId, vmId) {
-        // console.log('viewVm');
-
-        this.viewAccount(accountId);
-
-        var model = vmsCollection.findWhere({ uuid: vmId });
-        vmView = new VmView({ model: model });
-        $('#js-vm').html(vmView.render().el);
-
-    },
-
-
-    viewAccount: function(accountId) {
-
-        this.viewAccounts();
-
-        var model = accountsCollection.findWhere({ uuid: accountId });
-        accountView = new AccountView({ model: model });
-        mainLayout.account.show(accountView);
-
-
-// Show third column here
-        // var model = vmsCollection.findWhere({ account_uuid: accountId });
-        // vmView = new VmsView({ model: model });
-        //  $('#js-vms').html(vmsView.render().el);
-        //  if(vmView) {
-        //     vmView.remove();
-        // }
-    },
-
-
-
-    viewAccounts: function() {
-        mainLayout.accounts.show(accountsView);
-        if(accountView) {
-            accountView.remove();
-        }
-    }
-});
-new Router();
-*/

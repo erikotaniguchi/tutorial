@@ -31,8 +31,8 @@
     <div id="js-vms" class="col-md-3"></div>
     <div id="js-vm" class="col-md-3"></div>
     </div>
-
     </script>
+
     <script type="text/template" id="accounts-tmpl">
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -49,6 +49,7 @@
              <span class="location"><%= location %></span>
         </a>
     </script>
+
     <script type="text/template" id="account-tmpl">
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -58,13 +59,13 @@
             </div>
         </div>
     </script>
+
     <script type="text/template" id="account-param-tmpl">
         <li class="list-group-item">
-        v    <span class="name"><%= name %></span>:
+             <span class="name"><%= name %></span>:
              <span class="value"><%= value %></span>
         </li>
     </script>
-
 
     <script type="text/template" id="vms-tmpl">
     <div class="panel panel-default">
@@ -75,29 +76,30 @@
             <ul class='js-vms-list list-group'></ul>
         </div>
     </div>
-</script>
+    </script>
+
     <script type="text/template" id="vm-item-tmpl">
         <a href="#accounts/<%= account_uuid %>/vms/<%= uuid %>">
-            <span class="name"><%= account_name %></span>
+            <span class="name"><%= name %></span>
              <span class="status"><%= extra.status %></span>
         </a>
     </script>
+
     <script type="text/template" id="vm-tmpl">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Account: <%= account_name %></h3>
+                <h3 class="panel-title">Virtual Machine: <%= name %></h3>
             </div>
-            <div class="panel-body">
-                <ul class='js-vm-param-list list-group'></ul>
+            <div class="panel-body js-vm-param-list">
+
             </div>
         </div>
     </script>
     <script type="text/template" id="vm-param-tmpl">
         <li class="list-group-item">
-            <span class="key"><%= key %></span>:
+             <span class="name"><%= name %></span>:
              <span class="value"><%= value %></span>
         </li>
-
     </script>
 
     <script src="vendor/jquery/dist/jquery.js"></script>
