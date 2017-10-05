@@ -1,3 +1,6 @@
+define(['jquery','underscore','backbone','marionette'],function ($) {
+
+
 var AccountModel = Backbone.Model.extend({});
 var AccountCollection = Backbone.Collection.extend({
     url: 'data/accounts.json',
@@ -197,90 +200,93 @@ var VmView = Backbone.Marionette.LayoutView.extend({
 // var vmView;
 
 
-var App = new Backbone.Marionette.Application({
-    accountsView: null,
-    vmsView: null,
-    vmView: null,
-    mainLayout: null,
-    accountsCollection: null,
-    vmsCollection: null,
-    onBeforeStart: function() {
-        this.router = new Marionette.AppRouter({
-            appRoutes: {
-                "accounts/:uuid/vms/:vmuuid": "viewAccountVM",
-                "accounts/:uuid": "viewAccount",
-                "*other": "viewAccounts"
-            },
-            controller: this
-        });
-    },
-    onStart: function() {
-        this.createCollections();
-        this.createViews();
-    },
-    createCollections: function() {
-        var self = this;
-        this.accountsCollection = new AccountCollection();
-        this.vmsCollection = new VmCollection();
-        this.accountsCollection.fetch({
-            reset: true,
-            success: function(collection) {
-                self.vmsCollection.fetch({
-                    reset: true,
-                    success: function(collection) {
-                        console.log('loaded vms ', collection);
-                        Backbone.history.start();
-                    },
-                    error: function() {
-                        console.log('error loading accounts ', arguments);
-                    }
-                });
-            },
-            error: function() {
-                console.log('error loading accounts ', arguments);
+    var App = new Backbone.Marionette.Application({
+        accountsView: null,
+        vmsView: null,
+        vmView: null,
+        mainLayout: null,
+        accountsCollection: null,
+        vmsCollection: null,
+        onBeforeStart: function() {
+            this.router = new Marionette.AppRouter({
+                appRoutes: {
+                    "accounts/:uuid/vms/:vmuuid": "viewAccountVM",
+                    "accounts/:uuid": "viewAccount",
+                    "*other": "viewAccounts"
+                },
+                controller: this
+            });
+        },
+        onStart: function() {
+            this.createCollections();
+            this.createViews();
+        },
+        createCollections: function() {
+            var self = this;
+            this.accountsCollection = new AccountCollection();
+            this.vmsCollection = new VmCollection();
+            this.accountsCollection.fetch({
+                reset: true,
+                success: function(collection) {
+                    self.vmsCollection.fetch({
+                        reset: true,
+                        success: function(collection) {
+                            console.log('loaded vms ', collection);
+                            Backbone.history.start();
+                        },
+                        error: function() {
+                            console.log('error loading accounts ', arguments);
+                        }
+                    });
+                },
+                error: function() {
+                    console.log('error loading accounts ', arguments);
+                }
+            });
+        },
+        createViews: function() {
+            this.accountsView = new AccountsView({
+                collection: this.accountsCollection
+            });
+            this.mainLayout = new MainLayout();
+            this.mainLayout.render();
+        },
+        viewAccountVM: function(accountId, vmId) {
+            this.viewAccount(accountId);
+
+            console.log('viewVm');
+
+            var model = vmsCollection.findWhere({ uuid: vmId });
+            this.vmView = new VmView({ model: model });
+            this.mainLayout.vm.show(this.vmView);
+            // vmView = new VmView({ model: model });
+            // $('#js-vm').html(vmView.render().el);
+        },
+        viewAccount: function(accountId) {
+            this.viewAccounts();
+            var model = this.accountsCollection.findWhere({ uuid: accountId }),
+                collection = new VmCollection(this.vmsCollection.where({ account_uuid: accountId }));
+            this.accountView = new AccountView({ model: model });
+            this.mainLayout.account.show(this.accountView);
+            vmsView = new VmsView({ collection: collection });
+            $('#js-vms').html(vmsView.render().el);
+        },
+        viewAccounts: function() {
+            this.mainLayout.accounts.show(this.accountsView);
+            if(this.accountView) {
+                this.accountView.remove();
             }
-        });
-    },
-    createViews: function() {
-        this.accountsView = new AccountsView({
-            collection: this.accountsCollection
-        });
-        this.mainLayout = new MainLayout();
-        this.mainLayout.render();
-    },
-    viewAccountVM: function(accountId, vmId) {
-        this.viewAccount(accountId);
-
-        console.log('viewVm');
-
-        var model = vmsCollection.findWhere({ uuid: vmId });
-        this.vmView = new VmView({ model: model });
-        this.mainLayout.vm.show(this.vmView);
-        // vmView = new VmView({ model: model });
-        // $('#js-vm').html(vmView.render().el);
-    },
-    viewAccount: function(accountId) {
-        this.viewAccounts();
-        var model = this.accountsCollection.findWhere({ uuid: accountId }),
-            collection = new VmCollection(this.vmsCollection.where({ account_uuid: accountId }));
-        this.accountView = new AccountView({ model: model });
-        this.mainLayout.account.show(this.accountView);
-        vmsView = new VmsView({ collection: collection });
-        $('#js-vms').html(vmsView.render().el);
-    },
-    viewAccounts: function() {
-        this.mainLayout.accounts.show(this.accountsView);
-        if(this.accountView) {
-            this.accountView.remove();
+            if(this.vmsView) {
+                this.vmsView.remove();
+            }
+            if(this.vmView) {
+                this.vmView.remove();
+            }
         }
-        if(this.vmsView) {
-            this.vmsView.remove();
-        }
-        if(this.vmView) {
-            this.vmView.remove();
-        }
+    });
+// App.start();
+    return {
+        app:App
     }
 });
-App.start();
-
 
